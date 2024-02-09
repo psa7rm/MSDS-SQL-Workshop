@@ -14,39 +14,42 @@ CREATE TABLE Clients (
     Address TEXT
 );
 
-
 -- Create Employee Table
 CREATE TABLE Employees (
     EmployeeID INT AUTO_INCREMENT PRIMARY KEY,
-    FirstName VARCHAR(255),
-    LastName VARCHAR(255),
-    Email VARCHAR(255),
+    FirstName VARCHAR(255) NOT NULL,
+    LastName VARCHAR(255) NOT NULL,
+    Email VARCHAR(255) UNIQUE NOT NULL,
     Department VARCHAR(255),
     Position VARCHAR(255),
-    HireDate DATE,
-    Salary DECIMAL(10, 2)
+    HireDate DATE NOT NULL,
+    Salary DECIMAL(10, 2) CHECK (Salary > 0)
 );
 
 -- Create Projects Table
 CREATE TABLE Projects (
     ProjectID INT AUTO_INCREMENT PRIMARY KEY,
-    ProjectName VARCHAR(255),
+    ProjectName VARCHAR(255) NOT NULL,
+    ClientID INT,
     StartDate DATE,
     EndDate DATE,
-    Budget DECIMAL(10, 2),
-    Status VARCHAR(100)
+    Budget DECIMAL(10, 2) CHECK (Budget >= 0),
+    Status VARCHAR(100),
+    FOREIGN KEY (ClientID) REFERENCES Clients(ClientID)
 );
 
 -- Create Pursuits Table for Business Development
 CREATE TABLE Pursuits (
     PursuitID INT AUTO_INCREMENT PRIMARY KEY,
-    Title VARCHAR(255),
+    Title VARCHAR(255) NOT NULL,
+    ClientID INT,
     Description TEXT,
     StartDate DATE,
     EstimatedEndDate DATE,
-    Budget DECIMAL(10, 2),
+    Budget DECIMAL(10, 2) CHECK (Budget >= 0),
     Stage ENUM('initiated', 'proposing', 'closing') NOT NULL,
-    Notes VARCHAR(100)
+    Notes VARCHAR(100),
+    FOREIGN KEY (ClientID) REFERENCES Clients(ClientID)
 );
 
 
@@ -82,22 +85,4 @@ CREATE TABLE PursuitProjectMap (
     FOREIGN KEY (PursuitID) REFERENCES Pursuits(PursuitID),
     FOREIGN KEY (ProjectID) REFERENCES Projects(ProjectID),
     PRIMARY KEY (PursuitID, ProjectID)
-);
-
--- Mapping Table: Projects -> Clients
-CREATE TABLE ProjectClientMap (
-    ProjectID INT,
-    ClientID INT,
-    FOREIGN KEY (ProjectID) REFERENCES Projects(ProjectID),
-    FOREIGN KEY (ClientID) REFERENCES Clients(ClientID),
-    PRIMARY KEY (ProjectID, ClientID)
-);
-
--- Mapping Table: Pursuits -> Clients
-CREATE TABLE PursuitClientMap (
-    PursuitID INT,
-    ClientID INT,
-    FOREIGN KEY (PursuitID) REFERENCES Pursuits(PursuitID),
-    FOREIGN KEY (ClientID) REFERENCES Clients(ClientID),
-    PRIMARY KEY (PursuitID, ClientID)
 );
